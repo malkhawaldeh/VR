@@ -2,117 +2,43 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Destroyed City VR Scene</title>
+    <title>VR Shooter POV</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.controls.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-animation-component@5.0.0/dist/aframe-animation-component.min.js"></script>
-
     <style>
-      html,
-      body {
+      html, body {
         margin: 0;
-        padding: 0;
-        overflow: hidden;
         height: 100%;
-        width: 100%;
+        overflow: hidden;
       }
     </style>
-
-    <script>
-      AFRAME.registerComponent("gun-trigger", {
-        init: function () {
-          this.el.addEventListener("triggerdown", () => {
-            const flash = this.el.querySelector(".muzzle");
-            if (flash) {
-              flash.emit("flash");
-            }
-          });
-        },
-      });
-    </script>
   </head>
 
   <body>
-    <a-scene
-      background="color: #000"
-      shadow="type: pcfsoft"
-      renderer="antialias: true; shadowMap: true"
-    >
-      <!-- Skybox (destroyed city panorama) -->
+    <a-scene background="color: #000">
+
+      <!-- 360 panoramic destroyed city background -->
       <a-sky src="back.jpg" rotation="0 -90 0"></a-sky>
 
-      <!-- Ambient + Directional light -->
-      <a-entity light="type: ambient; intensity: 0.6; color: #ccc"></a-entity>
-      <a-entity
-        light="type: directional; intensity: 0.8; castShadow: true"
-        position="2 4 2"
-      ></a-entity>
+      <!-- Lighting -->
+      <a-entity light="type: ambient; intensity: 1.2"></a-entity>
 
-      <!-- Ground plane -->
-      <a-plane
-        rotation="-90 0 0"
-        width="100"
-        height="100"
-        color="#444"
-        shadow
-      ></a-plane>
-
-      <!-- Target object -->
-      <a-box
-        class="shootable"
-        position="0 1.5 -5"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        color="#ff0000"
-        shadow
-      ></a-box>
-
-      <!-- Camera rig with WASD movement and gun -->
-      <a-entity id="rig" position="0 1.6 0" movement-controls>
+      <!-- Camera rig (you are the player) -->
+      <a-entity id="rig" position="0 0 0">
         <a-camera wasd-controls look-controls>
-          <!-- Gun (mock 3D model made of boxes) -->
+          <!-- Ready-to-use pistol model from CDN -->
           <a-entity
-            id="gun"
-            gun-trigger
-            position="0 -0.25 -0.8"
-            rotation="0 90 0"
-          >
-            <!-- Gun body -->
-            <a-box
-              depth="0.6"
-              height="0.1"
-              width="0.2"
-              color="black"
-              position="0 0 0"
-            ></a-box>
-
-            <!-- Barrel -->
-            <a-box
-              depth="0.2"
-              height="0.05"
-              width="0.05"
-              color="gray"
-              position="0 0 0.4"
-            ></a-box>
-
-            <!-- Muzzle flash -->
-            <a-entity
-              class="muzzle"
-              position="0 0 0.5"
-              light="type: point; intensity: 2; distance: 0.5; color: yellow"
-              animation="property: light.intensity; from: 2; to: 0; dur: 100; autoplay: false; startEvents: flash"
-            ></a-entity>
+            gltf-model="https://cdn.aframe.io/test-models/models/gun/scene.gltf"
+            scale="0.2 0.2 0.2"
+            position="0 -0.2 -0.5"
+            rotation="0 90 0">
           </a-entity>
         </a-camera>
 
-        <!-- Controller (for Oculus Touch) -->
-        <a-entity
-          laser-controls="hand: right"
-          raycaster="objects: .shootable"
-        ></a-entity>
+        <!-- Right hand controller (shows laser) -->
+        <a-entity laser-controls="hand: right"></a-entity>
       </a-entity>
+
     </a-scene>
   </body>
 </html>
