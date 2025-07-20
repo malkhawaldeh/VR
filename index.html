@@ -1,156 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>VR Shooter Demo - Detailed</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <head>
+    <meta charset="utf-8" />
+    <title>Destroyed City VR Scene</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.controls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-animation-component@5.0.0/dist/aframe-animation-component.min.js"></script>
 
-  <!-- A-Frame Core -->
-  <script src="https://cdn.jsdelivr.net/npm/aframe@1.7.1/dist/aframe.min.js"></script>
-
-  <!-- Custom Components -->
-  <script>
-  // --- Recoil Component: pushes gun back then eases back ---
-  AFRAME.registerComponent('recoil', {
-    schema: { power: {type: 'number', default: 0.05} },
-    init: function() {
-      this.velocity = new THREE.Vector3();
-    },
-    shoot: function() {
-      // apply impulse backwards
-      this.velocity.z -= this.data.power;
-    },
-    tick: function(time, dt) {
-      if (Math.abs(this.velocity.z) > 0.0001) {
-        this.el.object3D.position.add(this.velocity);
-        // dampen
-        this.velocity.multiplyScalar(0.8);
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
       }
-    }
-  });
+    </style>
 
-  // --- Muzzle flash: quick light flash when shooting ---
-  AFRAME.registerComponent('muzzle-flash', {
-    init: function() {
-      this.light = document.createElement('a-entity');
-      this.light.setAttribute('light', 'type: point; intensity: 0; distance: 2; color: #ffdd99');
-      this.el.appendChild(this.light);
-    },
-    shoot: function() {
-      // light
-      this.light.setAttribute('light', 'intensity', 2);
-      setTimeout(() => { this.light.setAttribute('light', 'intensity', 0); }, 50);
-    }
-  });
-
-  // --- Crosshair: small ring to aim ---
-  AFRAME.registerComponent('crosshair', {
-    init: function() {
-      const el = this.el;
-      el.setAttribute('geometry', 'primitive: ring; radiusInner: 0.005; radiusOuter: 0.008');
-      el.setAttribute('material', 'color: #fff; shader: flat; opacity: 0.8');
-      el.setAttribute('position', '0 0 -1');
-    }
-  });
-  </script>
-</head>
-
-<body>
-  <a-scene
-    fog="type: exponential; color: #333; density: 0.015"
-    renderer="antialias: true; colorManagement: true"
-    xr="optionalFeatures: local-floor; requiredFeatures: hit-test"
-    loading-screen="enabled: false">
-
-    <!-- ========== Assets ========== -->
-    <a-assets>
-      <!-- Replace the sky hdr/pano with your destroyed city image -->
-      <img id="env-sky" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/sechelt.jpg">
-      <!-- Example glTF gun model -->
-      <a-asset-item id="gun-gltf" src="https://cdn.glitch.com/.../pistol.glb"></a-asset-item>
-      <!-- Ground texture -->
-      <img id="ground-tex" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
-      <!-- Optional debris model placeholder -->
-      <!--<a-asset-item id="debris-model" src="PATH/TO/DEBRIS.glb"></a-asset-item>-->
-    </a-assets>
-
-    <!-- ========== Environmental Lighting ========== -->
-    <a-sky src="#env-sky" rotation="0 -90 0"></a-sky>
-    <a-entity light="type: ambient; intensity: 0.6; color: #aaa"></a-entity>
-    <a-entity light="type: directional; intensity: 0.8; color: #fff" position="1 4 2"></a-entity>
-
-    <!-- ========== Ground & Fog ========== -->
-    <a-plane rotation="-90 0 0" width="50" height="50"
-             material="src: #ground-tex; repeat: 25 25; roughness: 1; metalness: 0.1">
-    </a-plane>
-
-    <!-- ========== Camera Rig ========== -->
-    <a-entity id="rig" position="0 1.6 0">
-      <!-- Camera -->
-      <a-camera id="camera" wasd-controls="acceleration: 50" look-controls>
-        <!-- Crosshair -->
-        <a-entity crosshair></a-entity>
-
-        <!-- Gun Holder (child of camera) -->
-        <a-entity id="gun-holder" position="0 -0.2 -0.5">
-          <a-entity id="gun"
-                    gltf-model="#gun-gltf"
-                    scale="0.4 0.4 0.4"
-                    rotation="0 90 0"
-                    recoil
-                    muzzle-flash>
-          </a-entity>
-        </a-entity>
-      </a-camera>
-
-      <!-- Right Controller -->
-      <a-entity id="right-controller"
-                hand-controls="hand: right"
-                raycaster="objects: .target"
-                line="color: #f00; opacity: 0.9"
-                oculus-touch-controls="hand: right"
-                thumbstick-trigger
-                event-set__triggerdown="_target: #gun; recoil.shoot: true"
-                event-set__triggerdown2="_target: #gun; muzzle-flash.shoot: true">
-      </a-entity>
-    </a-entity>
-
-    <!-- ========== Targets ========== -->
-    <!-- A grid of boxes to aim at -->
-    <a-entity id="targets">
-      <!-- Repeat multiple -->
-      <a-box class="target" position="0 1 -5" depth="0.2" height="0.5" width="0.5" color="#f22"></a-box>
-      <a-box class="target" position="1 0.8 -6" color="#2f2"></a-box>
-      <a-box class="target" position="-1 1.2 -7" color="#22f"></a-box>
-      <!-- Add more for density -->
-    </a-entity>
-
-    <!-- ========== Optional Debris Entities (commented template) ========== -->
-    <!--<a-entity gltf-model="#debris-model" position="2 0 -3" scale="1.5 1.5 1.5"></a-entity>
-    <a-entity gltf-model="#debris-model" position="-3 0 -2" scale="1 1 1"></a-entity>-->
-
-    <!-- ========== Skybox Light Effects ========== -->
-    <a-entity environment="preset: forest; fog: 0.5; dressingAmount: 0.3; lighting: flat"></a-entity>
-
-    <!-- ========== Debug Info (Optional) ========== -->
-    <a-entity id="debug" position="0 1 -0.5" visible="false">
-      <a-text value="DEBUG INFO:" color="#fff" position="0 0.1 0"></a-text>
-      <a-text id="debug-coords" value="" color="#0f0" position="0 0 0"></a-text>
-    </a-entity>
-
-    <!-- ========== Shoot Feedback Animation (optional) ========== -->
     <script>
-      // You can hook into collision or raycaster events here
-      const scene = document.querySelector('a-scene');
-      const rightCtrl = document.getElementById('right-controller');
-      rightCtrl.addEventListener('triggerdown', () => {
-        const intersects = rightCtrl.components.raycaster.getIntersection(document.querySelector('.target'));
-        if (intersects) {
-          intersects.object.el.setAttribute('material', 'color', '#ff0');
-        }
+      AFRAME.registerComponent("gun-trigger", {
+        init: function () {
+          this.el.addEventListener("triggerdown", () => {
+            const flash = this.el.querySelector(".muzzle");
+            if (flash) {
+              flash.emit("flash");
+            }
+          });
+        },
       });
     </script>
+  </head>
 
-  </a-scene>
-</body>
+  <body>
+    <a-scene
+      background="color: #000"
+      shadow="type: pcfsoft"
+      renderer="antialias: true; shadowMap: true"
+    >
+      <!-- Skybox (destroyed city panorama) -->
+      <a-sky src="back.jpg" rotation="0 -90 0"></a-sky>
+
+      <!-- Ambient + Directional light -->
+      <a-entity light="type: ambient; intensity: 0.6; color: #ccc"></a-entity>
+      <a-entity
+        light="type: directional; intensity: 0.8; castShadow: true"
+        position="2 4 2"
+      ></a-entity>
+
+      <!-- Ground plane -->
+      <a-plane
+        rotation="-90 0 0"
+        width="100"
+        height="100"
+        color="#444"
+        shadow
+      ></a-plane>
+
+      <!-- Target object -->
+      <a-box
+        class="shootable"
+        position="0 1.5 -5"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        color="#ff0000"
+        shadow
+      ></a-box>
+
+      <!-- Camera rig with WASD movement and gun -->
+      <a-entity id="rig" position="0 1.6 0" movement-controls>
+        <a-camera wasd-controls look-controls>
+          <!-- Gun (mock 3D model made of boxes) -->
+          <a-entity
+            id="gun"
+            gun-trigger
+            position="0 -0.25 -0.8"
+            rotation="0 90 0"
+          >
+            <!-- Gun body -->
+            <a-box
+              depth="0.6"
+              height="0.1"
+              width="0.2"
+              color="black"
+              position="0 0 0"
+            ></a-box>
+
+            <!-- Barrel -->
+            <a-box
+              depth="0.2"
+              height="0.05"
+              width="0.05"
+              color="gray"
+              position="0 0 0.4"
+            ></a-box>
+
+            <!-- Muzzle flash -->
+            <a-entity
+              class="muzzle"
+              position="0 0 0.5"
+              light="type: point; intensity: 2; distance: 0.5; color: yellow"
+              animation="property: light.intensity; from: 2; to: 0; dur: 100; autoplay: false; startEvents: flash"
+            ></a-entity>
+          </a-entity>
+        </a-camera>
+
+        <!-- Controller (for Oculus Touch) -->
+        <a-entity
+          laser-controls="hand: right"
+          raycaster="objects: .shootable"
+        ></a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
 </html>
