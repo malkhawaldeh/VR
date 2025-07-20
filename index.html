@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>VR Shooter POV</title>
+    <title>VR Gun Hand</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <style>
@@ -17,28 +17,30 @@
   <body>
     <a-scene background="color: #000">
 
-      <!-- 360 panoramic destroyed city background -->
+      <!-- 360 panoramic background -->
       <a-sky src="back.jpg" rotation="0 -90 0"></a-sky>
 
       <!-- Lighting -->
       <a-entity light="type: ambient; intensity: 1.2"></a-entity>
 
-      <!-- Camera rig (you are the player) -->
+      <!-- Camera rig -->
       <a-entity id="rig" position="0 0 0">
-        <a-camera wasd-controls look-controls>
-          <!-- Ready-to-use pistol model from CDN -->
+        <a-camera wasd-controls look-controls></a-camera>
+
+        <!-- Controller + Gun model (gun follows hand) -->
+        <a-entity
+          id="right-hand"
+          laser-controls="hand: right"
+          raycaster="objects: .shootable"
+        >
           <a-entity
             gltf-model="https://cdn.aframe.io/test-models/models/gun/scene.gltf"
-            scale="0.2 0.2 0.2"
-            position="0 -0.2 -0.5"
-            rotation="0 90 0">
-          </a-entity>
-        </a-camera>
-
-        <!-- Right hand controller (shows laser) -->
-        <a-entity laser-controls="hand: right"></a-entity>
+            scale="0.15 0.15 0.15"
+            position="0 -0.05 -0.1"
+            rotation="0 0 0"
+          ></a-entity>
+        </a-entity>
       </a-entity>
-
     </a-scene>
   </body>
 </html>
