@@ -6,42 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <style>
-      html, body {
-        margin: 0;
-        height: 100%;
-        overflow: hidden;
-      }
+      html, body { margin: 0; height: 100%; overflow: hidden; }
     </style>
   </head>
 
   <body>
     <a-scene background="color: #000">
-
-      <!-- 360 panoramic background -->
       <a-sky src="back.jpg" rotation="0 -90 0"></a-sky>
-
-      <!-- Lighting -->
       <a-entity light="type: ambient; intensity: 1.2"></a-entity>
 
-      <!-- Camera rig -->
       <a-entity id="rig" position="0 0 0">
         <a-camera wasd-controls look-controls></a-camera>
 
-        <!-- Controller with gun model attached -->
-        <a-entity
-          id="right-hand"
-          laser-controls="hand: right"
-          raycaster="objects: .shootable"
-        >
-          <a-entity
-            gltf-model="pistol_concept.glb"
-            scale="0.25 0.25 0.25"
-            position="0 -0.05 -0.1"
-            rotation="0 0 0"
-          ></a-entity>
+        <!-- Right-hand controller with remote pistol model -->
+        <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .shootable">
+          <a-entity 
+            gltf-model="url(https://thangs.com/download/58959/pistol_low_poly.glb)" 
+            scale="0.3 0.3 0.3" 
+            position="0 -0.05 -0.1" 
+            rotation="0 10 0">
+          </a-entity>
         </a-entity>
       </a-entity>
-
     </a-scene>
   </body>
 </html>
